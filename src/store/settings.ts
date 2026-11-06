@@ -10,6 +10,8 @@ export interface SettingsState {
   view: ViewMode;
   leftHanded: boolean;
   baton: boolean;
+  /** 손과 지휘봉을 입체(3D)로 보기 */
+  hand3d: boolean;
   /** 잔상 길이(밀리초) 0~1500 */
   trailMs: number;
   showGhost: boolean;
@@ -32,6 +34,7 @@ export const useSettings = create<SettingsState>()(
       view: "conductor",
       leftHanded: false,
       baton: true,
+      hand3d: true,
       trailMs: 700,
       showGhost: true,
       showNumbers: true,

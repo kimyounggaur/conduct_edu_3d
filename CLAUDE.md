@@ -25,7 +25,7 @@
 
 ## 폴더
 - `src/engine` 패턴 데이터, 타임라인, 궤적, 재생 엔진, 오디오 예약
-- `src/render` 캔버스 그리기
+- `src/render` 캔버스 그리기 (2D), `src/render3d` 입체 손·지휘봉 (three.js)
 - `src/components` 화면 조각, `src/store` 설정·재생 상태
 - `src/content` 레슨·연습 JSON (Phase 3부터)
 - `tests` 단위 테스트, `scripts` 보조 스크립트
