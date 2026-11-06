@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { getPattern } from "@/engine/patterns";
+import { PATTERNS, getPattern } from "@/engine/patterns";
 import type { Exercise, PatternDef } from "@/engine/types";
 import { DEFAULT_STYLE } from "@/engine/types";
 import type { RenderOptions } from "@/render/CanvasRenderer";
@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FINITE_BARS, useLibrary } from "@/store/library";
 import { getRuntime, type PlaybackRuntime } from "@/store/runtime";
 import { useSettings } from "@/store/settings";
+import { readRequestedPattern } from "@/lib/requestedPattern";
 
 export function libraryExercise(pattern: PatternDef, bpm: number, countIn: 0 | 1 | 2, loop: boolean): Exercise {
   return {
@@ -39,8 +40,8 @@ function useLibraryRuntime(): PlaybackRuntime | null {
     let alive = true;
     Promise.all([useSettings.persist.rehydrate(), useLibrary.persist.rehydrate()]).then(() => {
       if (!alive) return;
-      // 홈의 "패턴 연습에서 해 보기" 링크: /library?pattern=FOUR
-      const wanted = new URLSearchParams(window.location.search).get("pattern");
+      // 홈의 "패턴 연습에서 해 보기" 링크: /library?pattern=FOUR (미리보기는 #library-four)
+      const wanted = readRequestedPattern(PATTERNS.map((p) => p.id));
       if (wanted && wanted !== useLibrary.getState().patternId) useLibrary.getState().selectPattern(wanted);
       setRt(getRuntime());
     });
@@ -100,7 +101,7 @@ export function LibraryScreen() {
   return (
     <div className="flex min-h-dvh flex-col">
       <SiteHeader />
-      <main className="mx-auto grid w-full max-w-[1440px] flex-1 gap-4 p-3 sm:p-4 md:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[264px_minmax(0,1fr)_288px] xl:gap-5 xl:p-5">
+      <main className="mx-auto grid w-full max-w-[1440px] flex-1 gap-4 p-4 md:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[264px_minmax(0,1fr)_288px] xl:gap-5 xl:p-5">
         <aside className="hidden xl:block">
           <div className="sticky top-5 max-h-[calc(100dvh-6rem)] overflow-y-auto pr-1">
             <PatternList />

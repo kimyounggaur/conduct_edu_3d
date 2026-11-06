@@ -153,6 +153,7 @@ function Tempo({
           =
         </span>
         <input
+          id="bpm-input"
           type="number"
           inputMode="numeric"
           min={BPM_MIN}

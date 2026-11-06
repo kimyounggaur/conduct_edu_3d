@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "demo:trajectory": "tsx scripts/demo-trajectory.ts"
+    "demo:trajectory": "tsx scripts/demo-trajectory.ts",
+    "build:preview": "node scripts/build-preview.mjs"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -31,8 +32,10 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "esbuild": "^0.28.2",
     "eslint": "^9",
     "eslint-config-next": "15.5.29",
+    "postcss": "^8.5.32",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
     "typescript": "^5",
