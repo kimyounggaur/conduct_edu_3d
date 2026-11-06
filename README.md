@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 지휘 기초 (conducting-trainer)
 
-## Getting Started
+지휘봉의 궤적을 메트로놈 박자에 맞춰 보여 주며 박자 패턴·예비박·끝맺음·진입 신호를 배우는 웹앱.
+설계는 [`docs/DESIGN.md`](docs/DESIGN.md), 설계와 달라진 점은 [`docs/IMPLEMENTATION_NOTES.md`](docs/IMPLEMENTATION_NOTES.md).
 
-First, run the development server:
+## 진행 상황
+
+| 단계 | 내용 | 상태 |
+|---|---|---|
+| Phase 0 | 프로젝트 준비 | 완료 (GitHub·Vercel 연결은 사용자 작업) |
+| Phase 1 | 패턴 데이터 · 타임라인 · 궤적 엔진 | 완료 |
+| Phase 2 | 궤적 시각화 + 박자 재생 (`/library`) | 완료, 실제 기기 확인 필요 |
+| Phase 3 | 레슨 시스템 | 다음 단계 |
+
+## 실행
+
+Node.js 20 이상이 필요합니다.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev          # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| 명령 | 하는 일 |
+|---|---|
+| `npm test` | 엔진 단위 테스트 (59개) |
+| `npm run typecheck` | 타입 검사 |
+| `npm run lint` | 코드 규칙 검사 |
+| `npm run build` | 배포용 빌드 |
+| `npm run demo:trajectory` | 모든 패턴의 궤적을 `docs/pattern-previews/`에 SVG로 저장 |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 화면
+- `/` 홈: 4박자 시연, 배우는 순서
+- `/library` 패턴 연습: 22개 패턴, 재생/일시정지/정지/반복/한 박씩/카운트인/빠르기(슬라이더·숫자·탭), 보기 설정
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+키보드: Space 재생/일시정지, Esc 정지, ←→ 한 박씩, ↑↓ 빠르기(Shift는 10씩), L 반복, M 소리 끄기, 1~9 패턴 고르기
 
-## Learn More
+## 폴더
+```
+src/engine     패턴 데이터, 타임라인, 궤적, 재생 엔진, Web Audio 클릭음 (React 없음)
+src/render     캔버스 그리기
+src/components 화면 조각
+src/store      설정·라이브러리·재생 상태 (Zustand)
+src/content    커리큘럼 개요 (Phase 3부터 레슨 JSON)
+tests          단위 테스트
+docs           설계문서, 구현 메모, 패턴 미리보기 SVG
+```
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 글꼴과 라이선스
+- Pretendard — SIL Open Font License 1.1
+- `src/app/fonts/podium-numerals.woff2` — Bravura(© Steinberg Media Technologies)에서 박자표·음표 글자만 뽑아 이름을 바꾼 파생 글꼴, SIL OFL 1.1 (`podium-numerals.LICENSE.txt`)
+- 앱의 설명문과 그림은 자체 제작. 참고 자료(Berklee 등)의 문장·그림은 쓰지 않음
