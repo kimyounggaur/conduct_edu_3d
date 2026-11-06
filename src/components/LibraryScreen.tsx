@@ -8,12 +8,12 @@ import type { RenderOptions } from "@/render/CanvasRenderer";
 import { isMirrored } from "@/render/transform";
 import { BeatDisplay } from "@/components/BeatDisplay";
 import { ConductorCanvas } from "@/components/ConductorCanvas";
-import { TempoNote, TimeSig } from "@/components/MusicType";
-import { OptionsPanel } from "@/components/OptionsPanel";
-import { PATTERN_ORDER, PatternList } from "@/components/PatternList";
+import { TimeSig } from "@/components/MusicType";
+import { PATTERN_ORDER } from "@/components/PatternList";
+import { PatternBar } from "@/components/PatternBar";
+import { SettingsSheet } from "@/components/SettingsSheet";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Transport, playOrPause, stepBy } from "@/components/Transport";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FINITE_BARS, useLibrary } from "@/store/library";
 import { getRuntime, type PlaybackRuntime } from "@/store/runtime";
 import { useSettings } from "@/store/settings";
@@ -40,7 +40,7 @@ function useLibraryRuntime(): PlaybackRuntime | null {
     let alive = true;
     Promise.all([useSettings.persist.rehydrate(), useLibrary.persist.rehydrate()]).then(() => {
       if (!alive) return;
-      // 홈의 "패턴 연습에서 해 보기" 링크: /library?pattern=FOUR (미리보기는 #library-four)
+      // 홈의 링크나 미리보기 주소로 패턴을 지정한 경우: /library?pattern=FOUR (미리보기는 #library-four)
       const wanted = readRequestedPattern(PATTERNS.map((p) => p.id));
       if (wanted && wanted !== useLibrary.getState().patternId) useLibrary.getState().selectPattern(wanted);
       setRt(getRuntime());
@@ -52,6 +52,10 @@ function useLibraryRuntime(): PlaybackRuntime | null {
   return rt;
 }
 
+/**
+ * 패턴 연습 화면 — 한 줄기로: 박자 고르기 → 궤적 → 조작.
+ * 나머지(다른 박자 목록, 카운트인·반복·탭, 보기·소리·단축키)는 서랍 안에 있다.
+ */
 export function LibraryScreen() {
   const rt = useLibraryRuntime();
   const { patternId, bpm, countIn, loop } = useLibrary();
@@ -100,108 +104,38 @@ export function LibraryScreen() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <SiteHeader />
-      <main className="mx-auto grid w-full max-w-[1440px] flex-1 gap-4 p-4 md:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[264px_minmax(0,1fr)_288px] xl:gap-5 xl:p-5">
-        <aside className="hidden xl:block">
-          <div className="sticky top-5 max-h-[calc(100dvh-6rem)] overflow-y-auto pr-1">
-            <PatternList />
-          </div>
-        </aside>
+      <SiteHeader actions={<SettingsSheet />} />
+      <main className="flex flex-1 flex-col px-4 py-4 sm:px-6 sm:py-5">
+        <h1 className="sr-only">패턴 연습</h1>
+        {/* 화면 높이에 맞춰 그림(4:3)이 한눈에 들어오는 폭으로 가운데 정렬. 박자 버튼·조작줄도 같은 폭 */}
+        <div className="mx-auto flex w-full flex-col gap-3 md:max-w-[max(30rem,calc((100dvh-17rem)*4/3))]">
+          <PatternBar />
 
-        <section className="flex min-w-0 flex-col gap-3" aria-label="지휘 궤적">
-          <div className="mx-auto w-full md:w-[min(100%,calc((100dvh-15rem)*4/3))]">
-            <div className="relative aspect-square overflow-hidden rounded-2xl border border-rule bg-sheet md:aspect-[4/3]">
-              {rt ? (
-                <ConductorCanvas
-                  engine={rt.engine}
-                  options={renderOptions}
-                  label={`${pattern.nameKo} 지휘 패턴. ${pattern.summary}`}
-                  className="absolute inset-0"
-                />
-              ) : null}
-              {/* 종이 위의 표기: 왼쪽 위 박자표, 오른쪽 위 현재 박, 오른쪽 아래 빠르기 */}
-              <div className="pointer-events-none absolute top-3 left-4 flex items-start gap-3 sm:top-4 sm:left-5">
-                <TimeSig value={pattern.timeSignature} size={44} className="text-ink" />
-                <div className="pt-0.5">
-                  <div className="text-[15px] font-semibold text-ink sm:text-[17px]">{pattern.nameKo}</div>
-                  <div className="hidden text-[13px] text-graphite sm:block">{pattern.summary}</div>
-                </div>
-              </div>
-              <div className="pointer-events-none absolute top-3 right-4 sm:top-4 sm:right-5">
-                <BeatDisplay size={52} />
-              </div>
-              <div className="pointer-events-none absolute right-5 bottom-4 hidden items-center gap-1 text-ink md:flex">
-                <TempoNote unit={pattern.tempoUnit} className="text-[22px]" />
-                <span className="text-[15px] tabular-nums">= {bpm}</span>
-              </div>
+          <div className="relative aspect-square overflow-hidden rounded-2xl border border-rule bg-sheet md:aspect-[4/3]">
+            {rt ? (
+              <ConductorCanvas
+                engine={rt.engine}
+                options={renderOptions}
+                label={`${pattern.nameKo} 지휘 패턴. ${pattern.summary}`}
+                className="absolute inset-0"
+              />
+            ) : null}
+            {/* 종이 위의 표기는 둘만: 왼쪽 위 박자표와 이름, 오른쪽 위 지금 몇 박 */}
+            <div className="pointer-events-none absolute top-3 left-4 flex items-center gap-2.5 sm:top-4 sm:left-5">
+              <TimeSig value={pattern.timeSignature} size={40} className="text-ink" />
+              <span className="text-[15px] font-semibold text-ink">{pattern.nameKo}</span>
+            </div>
+            <div className="pointer-events-none absolute top-3 right-4 sm:top-4 sm:right-5">
+              <BeatDisplay size={52} showBar={false} />
             </div>
           </div>
+
+          {/* 손 움직임 설명 한 줄 (두 줄이 되는 좁은 화면에서도 아래 조작줄이 밀리지 않게 높이를 잡아 둔다) */}
+          <p className="min-h-[2.6rem] text-center text-[15px] leading-snug text-graphite sm:min-h-0">{pattern.summary}</p>
+
           {rt && <Transport engine={rt.engine} tempoUnit={pattern.tempoUnit} />}
-
-          {/* 휴대폰: 패턴과 보기 설정을 탭으로 */}
-          <div className="md:hidden">
-            <SidePanels onPicked={() => window.scrollTo({ top: 0, behavior: "smooth" })} />
-          </div>
-        </section>
-
-        <aside className="hidden md:block">
-          <div className="sticky top-5 max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-2xl border border-rule bg-sheet p-4">
-            {/* 태블릿: 탭 / 큰 화면: 보기 설정만 (패턴 목록은 왼쪽) */}
-            <div className="xl:hidden">
-              <SidePanels />
-            </div>
-            <div className="hidden xl:block">
-              <h2 className="mb-4 text-[15px] font-semibold text-ink">보기 설정</h2>
-              <OptionsPanel />
-            </div>
-          </div>
-        </aside>
+        </div>
       </main>
-      <ShortcutHint />
-    </div>
-  );
-}
-
-function SidePanels({ onPicked }: { onPicked?: () => void }) {
-  return (
-    <Tabs defaultValue="patterns" className="gap-3">
-      <TabsList className="h-11 w-full">
-        <TabsTrigger value="patterns" className="text-[15px]">
-          패턴
-        </TabsTrigger>
-        <TabsTrigger value="options" className="text-[15px]">
-          보기 설정
-        </TabsTrigger>
-      </TabsList>
-      <TabsContent value="patterns" className="rounded-2xl border border-rule bg-sheet p-3 md:border-0 md:p-0">
-        <PatternList onPicked={onPicked} />
-      </TabsContent>
-      <TabsContent value="options" className="rounded-2xl border border-rule bg-sheet p-4 md:border-0 md:p-1">
-        <OptionsPanel />
-      </TabsContent>
-    </Tabs>
-  );
-}
-
-const SHORTCUTS: Array<[string, string]> = [
-  ["Space", "재생/일시정지"],
-  ["Esc", "정지"],
-  ["← →", "한 박씩"],
-  ["↑ ↓", "빠르기 (Shift는 10씩)"],
-  ["L", "반복"],
-  ["M", "소리 끄기"],
-  ["1–9", "패턴 고르기"],
-];
-
-function ShortcutHint() {
-  return (
-    <div className="mx-auto hidden w-full max-w-[1440px] flex-wrap gap-x-5 gap-y-1 px-5 pb-4 text-[12.5px] text-graphite md:flex">
-      {SHORTCUTS.map(([key, what]) => (
-        <span key={key} className="inline-flex items-center gap-1.5">
-          <kbd className="rounded border border-rule bg-sheet px-1.5 py-px font-sans text-[11.5px] text-ink">{key}</kbd>
-          {what}
-        </span>
-      ))}
     </div>
   );
 }
@@ -212,7 +146,10 @@ function useShortcuts(rt: PlaybackRuntime | null) {
     if (!rt) return;
     const { engine } = rt;
     const onKey = (e: KeyboardEvent) => {
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      // 이미 다른 곳에서 처리한 키(예: 서랍을 닫는 Esc)와 조합 키는 건드리지 않는다
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      // 설정·박자 서랍이 열려 있는 동안에는 단축키를 쓰지 않는다
+      if (document.querySelector('[role="dialog"][data-state="open"]')) return;
       const el = e.target as HTMLElement | null;
       const tag = el?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el?.isContentEditable) return;
