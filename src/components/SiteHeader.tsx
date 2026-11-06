@@ -1,41 +1,15 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
 
-const NAV = [
-  { href: "/", label: "배우는 순서" },
-  { href: "/library", label: "패턴 연습" },
-];
-
-export function SiteHeader() {
-  const pathname = usePathname();
+/** 위쪽 줄: 로고(누르면 홈)와, 화면마다 다른 오른쪽 버튼 한 개 */
+export function SiteHeader({ actions }: { actions?: React.ReactNode }) {
   return (
     <header className="border-b border-rule bg-sheet">
-      <div className="mx-auto flex h-14 max-w-[1440px] items-center gap-6 px-4 sm:px-6">
+      <div className="mx-auto flex h-14 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2 text-[17px] font-bold tracking-tight text-ink">
           <BatonMark />
           지휘 기초
         </Link>
-        <nav className="flex items-center gap-1" aria-label="주요 메뉴">
-          {NAV.map((item) => {
-            const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "rounded-md px-3 py-1.5 text-[15px] text-graphite transition-colors hover:bg-wash hover:text-ink",
-                  active && "bg-wash font-semibold text-ink",
-                )}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
+        {actions}
       </div>
     </header>
   );
