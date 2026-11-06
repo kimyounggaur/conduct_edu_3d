@@ -104,7 +104,7 @@ export function LibraryScreen() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <SiteHeader actions={<SettingsSheet />} />
+      <SiteHeader actions={<SettingsSheet />} widthClass="md:max-w-[max(30rem,calc((100dvh-17rem)*4/3))]" />
       <main className="flex flex-1 flex-col px-4 py-4 sm:px-6 sm:py-5">
         <h1 className="sr-only">패턴 연습</h1>
         {/* 화면 높이에 맞춰 그림(4:3)이 한눈에 들어오는 폭으로 가운데 정렬. 박자 버튼·조작줄도 같은 폭 */}

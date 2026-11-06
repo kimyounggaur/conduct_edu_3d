@@ -1,10 +1,19 @@
 import Link from "next/link";
 
-/** 위쪽 줄: 로고(누르면 홈)와, 화면마다 다른 오른쪽 버튼 한 개 */
-export function SiteHeader({ actions }: { actions?: React.ReactNode }) {
+/**
+ * 위쪽 줄: 로고(누르면 홈)와, 화면마다 다른 오른쪽 버튼 한 개.
+ * widthClass: 아래 본문 칸과 같은 최대 너비를 줘서, 버튼이 본문 경계 안쪽에 오도록 맞춘다.
+ */
+export function SiteHeader({
+  actions,
+  widthClass = "max-w-[1100px]",
+}: {
+  actions?: React.ReactNode;
+  widthClass?: string;
+}) {
   return (
-    <header className="border-b border-rule bg-sheet">
-      <div className="mx-auto flex h-14 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6">
+    <header className="border-b border-rule bg-sheet px-4 sm:px-6">
+      <div className={`mx-auto flex h-14 w-full items-center justify-between gap-4 ${widthClass}`}>
         <Link href="/" className="flex items-center gap-2 text-[17px] font-bold tracking-tight text-ink">
           <BatonMark />
           지휘 기초
