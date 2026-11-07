@@ -102,7 +102,7 @@ export function OptionsPanel() {
           label="시점"
           hint={
             s.view === "conductor"
-              ? "거울을 보듯 내 오른손이 화면 오른쪽에 있어요. 따라 하기 쉬워요."
+              ? "지휘자 뒤에서 본 모습이에요. 내 오른손이 화면 오른쪽에 있어 따라 하기 쉬워요."
               : "연주자 자리에서 지휘자를 바라본 모습이에요. 좌우가 반대로 보여요."
           }
         >
@@ -145,6 +145,13 @@ export function OptionsPanel() {
         </Field>
         <div className="divide-y divide-rule">
           <SwitchRow id={`${uid}-baton`} label="지휘봉 들기" checked={s.baton} onChange={(baton) => s.update({ baton })} />
+          <SwitchRow
+            id={`${uid}-hand3d`}
+            label="입체 손 (3D)"
+            hint="끄면 손을 평면 그림으로 보여요. 기기가 느리면 꺼 보세요."
+            checked={s.hand3d}
+            onChange={(hand3d) => s.update({ hand3d })}
+          />
           <SwitchRow id={`${uid}-ghost`} label="전체 도형" checked={s.showGhost} onChange={(showGhost) => s.update({ showGhost })} />
           <SwitchRow id={`${uid}-numbers`} label="박 번호" checked={s.showNumbers} onChange={(showNumbers) => s.update({ showNumbers })} />
           <SwitchRow

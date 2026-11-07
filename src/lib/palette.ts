@@ -19,6 +19,8 @@ export const palette = {
   rule: "#D6DCE5",
   wash: "#E8EEF8",
   cork: "#C9A47E",
+  // 입체 손 살갗: 특정 피부색이 아닌 따뜻한 점토색
+  hand3d: "#D8C2AE",
 } as const;
 
 export type Accent = "strong" | "medium" | "weak";

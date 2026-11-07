@@ -65,13 +65,25 @@ export function LibraryScreen() {
   const renderOptions: RenderOptions = useMemo(
     () => ({
       mirror: isMirrored(settings.view, settings.leftHanded),
+      view: settings.view,
+      leftHanded: settings.leftHanded,
       baton: settings.baton,
+      hand3d: settings.hand3d,
       trailMs: settings.trailMs,
       showGhost: settings.showGhost,
       showNumbers: settings.showNumbers,
       showPlane: settings.showPlane,
     }),
-    [settings.view, settings.leftHanded, settings.baton, settings.trailMs, settings.showGhost, settings.showNumbers, settings.showPlane],
+    [
+      settings.view,
+      settings.leftHanded,
+      settings.baton,
+      settings.hand3d,
+      settings.trailMs,
+      settings.showGhost,
+      settings.showNumbers,
+      settings.showPlane,
+    ],
   );
 
   // 패턴이 바뀌면 처음(준비 자세)부터

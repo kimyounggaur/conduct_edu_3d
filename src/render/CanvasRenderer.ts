@@ -11,23 +11,39 @@ import { drawBaton } from "./layers/baton";
 import { drawFlash } from "./layers/flash";
 import { drawStatic, type StaticOptions } from "./layers/ghost";
 import { drawTrail } from "./layers/trail";
-import { makeTransform, type ViewTransform } from "./transform";
+import { makeTransform, type ViewMode, type ViewTransform } from "./transform";
 
 export interface RenderOptions extends StaticOptions {
   mirror: boolean;
+  /** 입체 손 레이어가 시점·손을 따로 알아야 해서 mirror와 별도로 둔다 */
+  view: ViewMode;
+  leftHanded: boolean;
   baton: boolean;
+  /** 손과 지휘봉을 입체(3D)로 그리기. 안 되는 기기에서는 2D로 그린다 */
+  hand3d: boolean;
   /** 잔상 길이(밀리초) */
   trailMs: number;
 }
 
 export const DEFAULT_RENDER_OPTIONS: RenderOptions = {
   mirror: false,
+  view: "conductor",
+  leftHanded: false,
   baton: true,
+  hand3d: true,
   trailMs: 700,
   showGhost: true,
   showNumbers: true,
   showPlane: true,
 };
+
+/** 지휘봉 끝점 색: 박을 치는 동안은 박 세기 색, 준비·대기 중에는 회색 */
+export function tipColor(frame: FrameState): string {
+  const step = frame.step;
+  return step.kind === "play" || (step.kind === "intro" && step.halfAttack && frame.phase >= 0.5)
+    ? accentColor(step.accent)
+    : palette.graphite;
+}
 
 export class CanvasRenderer {
   private ctx: CanvasRenderingContext2D;
@@ -82,7 +98,8 @@ export class CanvasRenderer {
     this.staticKey = "";
   }
 
-  draw(frame: FrameState | null, positionAt: (tau: number) => Vec3): void {
+  /** hand=false면 손·지휘봉은 그리지 않는다 (입체 손 레이어가 대신 그릴 때) */
+  draw(frame: FrameState | null, positionAt: (tau: number) => Vec3, hand = true): void {
     const { ctx } = this;
     if (!this.prepared || this.cssW === 0) return;
     this.ensureStatic();
@@ -92,14 +109,10 @@ export class CanvasRenderer {
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     if (!frame) return;
 
-    const step = frame.step;
-    const color =
-      step.kind === "play" || (step.kind === "intro" && step.halfAttack && frame.phase >= 0.5)
-        ? accentColor(step.accent)
-        : palette.graphite;
+    const color = tipColor(frame);
     drawTrail(ctx, this.tf, frame.tau, this.opts.trailMs / 1000, positionAt, color);
     drawFlash(ctx, this.tf, frame.tau, frame.lastIctus);
-    drawBaton(ctx, this.tf, frame.pos, this.opts.baton, color);
+    if (hand) drawBaton(ctx, this.tf, frame.pos, this.opts.baton, color);
   }
 
   private ensureStatic(): void {
